@@ -22,7 +22,7 @@ function Header() {
 
     const checkUser = async() => {
         const user = await Auth.currentAuthenticatedUser()
-        setName(user.attributes.given_name)
+        setName(user.attributes.name)
     }
 
     const showModal = () => {

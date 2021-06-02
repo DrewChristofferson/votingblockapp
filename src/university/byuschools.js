@@ -14,7 +14,7 @@ import SchoolTables from './schooltables'
 import schoolresolver from '../schoolresolver'
 import Detail from './detail'
 import { Auth } from 'aws-amplify';
-// import { withAuthenticator } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import AppContext from '../context/context'
 import MyTheme from '../styles/amplifyTheme'
 

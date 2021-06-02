@@ -1,0 +1,249 @@
+type School @model 
+  @key(fields: ["id"]) 
+  @auth(
+    rules: [
+      { allow: public, operations: [read], provider: apiKey},
+      { allow: owner }
+    ]
+  )
+{
+  id: ID!
+  name: String!
+  departments: [Department] @connection(keyName: "bySchool", fields: ["id"])
+}
+
+type Department @model 
+  @key(name: "bySchool", fields: ["schoolID", "name"]) 
+  @auth(
+    rules: [
+      { allow: public, operations: [read], provider: apiKey},
+      { allow: owner }
+    ]
+  )
+{
+  id: ID!
+  name: String!
+  schoolID: ID!
+  school: School @connection(fields: ["schoolID"])
+  professors: [Professor] @connection(keyName: "byDepartment", fields: ["id"])
+  courses: [Course] @connection(keyName: "byDepartmentCourse", fields: ["id"])
+}
+
+type Professor @model @searchable
+  @key(name: "byDepartment", fields: ["departmentID", "name"]) 
+  @key(name: "professorsByScore", fields: ["type", "score"], queryField: "professorsByScore")
+  @key(name: "professorsByDeptID", fields: ["type", "departmentID"], queryField: "professorsByDeptID")
+  @key(name: "professorsByName", fields: ["type", "name"], queryField: "professorsByName")
+  @key(name: "professorsBySchoolAndDept", fields: ["schoolID", "departmentID"], queryField: "professorsBySchoolAndDept")
+  @auth(
+    rules: [
+      { allow: public, operations: [read], provider: apiKey},
+      { allow: private, operations: [read, update, create]},
+      { allow: owner }
+    ]
+  )
+{
+  id: ID!
+  name: String!
+  type: String!
+  title: String!
+  departmentID: ID!
+  department: Department @connection(fields: ["departmentID"])
+  schoolID: ID!
+  school: School @connection(fields: ["schoolID"])
+  imgsrc: String
+  score: Int!
+  difficultyOne: Int 
+  difficultyTwo: Int 
+  difficultyThree: Int 
+  difficultyFour: Int 
+  difficultyFive: Int 
+  migration: Boolean
+  comments: [ProfessorComment] @connection(keyName: "byProfessor", fields: ["id"])
+  classes: [Class] @connection(keyName: "byProfessor", fields: ["id"])
+}
+
+type ProfessorComment @model
+  @key(name: "byProfessor", fields: ["professorID", "content"])
+  @auth(
+    rules: [
+      { allow: public, operations: [read], provider: apiKey },
+      { allow: private, operations: [read, create]},
+      { allow: owner }
+    ]
+  )
+{
+  id: ID!
+  professorID: ID!
+  content: String!
+  user: String!
+  userName: String!
+}
+
+type Class @model(queries: null)
+  @key(name: "byProfessor", fields: ["professorID", "courseID"])
+  @key(name: "byCourse", fields: ["courseID", "professorID"]) 
+  @auth(
+    rules: [
+      { allow: public, operations: [read], provider: apiKey},
+      { allow: private, operations: [read, update, create]},
+      { allow: owner }
+    ]
+  )
+  {
+  id: ID!
+  professorID: ID!
+  courseID: ID!
+  professor: Professor! @connection(fields: ["professorID"])
+  course: Course! @connection(fields: ["courseID"])
+}
+
+type Course @model @searchable
+  @key(name: "byDepartmentCourse", fields: ["departmentID", "name"]) 
+  @key(name: "coursesByScore", fields: ["type", "score"], queryField: "coursesByScore")
+  @key(name: "coursesByDeptID", fields: ["type", "departmentID"], queryField: "coursesByDeptID")
+  @key(name: "coursesByGE", fields: ["type", "isGeneralStr"], queryField: "coursesByGE")
+  @key(name: "coursesByName", fields: ["type", "name"], queryField: "coursesByName")
+  @key(name: "coursesBySchoolAndDept", fields: ["schoolID", "departmentID"], queryField: "coursesBySchoolAndDept")
+  @auth(
+    rules: [
+      { allow: owner }
+      { allow: private, operations: [read, update, create]},
+      { allow: public, operations: [read], provider: apiKey},
+      
+    ]
+  )
+{
+  id: ID!
+  name: String!
+  type: String!
+  code: String!
+  numCredits: Float
+  departmentID: ID!
+  department: Department @connection(fields: ["departmentID"])
+  schoolID: ID!
+  school: School @connection(fields: ["schoolID"])
+  imgsrc: String
+  description: String
+  score: Int!
+  isGeneral: Boolean!
+  isGeneralStr: String!
+  generalReqID: [String]
+  difficultyOne: Int 
+  difficultyTwo: Int 
+  difficultyThree: Int 
+  difficultyFour: Int 
+  difficultyFive: Int 
+  migration: Boolean
+  comments: [CourseComment] @connection(keyName: "byCourse", fields: ["id"])
+  classes: [Class] @connection(keyName: "byCourse", fields: ["id"])
+}
+
+type CourseComment @model
+  @key(name: "byCourse", fields: ["courseID", "content"])
+  @auth(
+    rules: [
+      { allow: public, operations: [read], provider: apiKey },
+      { allow: private, operations: [read, create]},
+      { allow: owner }
+    ]
+  )
+{
+  id: ID!
+  courseID: ID!
+  content: String!
+  user: String!
+  userName: String!
+}
+
+type Rating @model
+  @key(name: "ratingsByUserAndContent", fields: ["userID", "contentID"], queryField : "ratingsByUserAndContent")
+  @key(name: "ratingsByUserAndCategory", fields: ["userID", "category"], queryField : "ratingsByUserAndCategory")
+  @key(name: "ratingsByContent", fields: ["type", "contentID"], queryField : "ratingsByContent")
+  @key(name: "ratingsByCategory", fields: ["type", "category"], queryField : "ratingsByCategory")
+  @auth(
+    rules: [
+      { allow: private, operations: [create, update, delete, read]},
+      { allow: public, operations: [read], provider: apiKey},
+    ]
+  )
+{
+  id: ID!
+  type: String!
+  userID: String!
+  contentID: ID!
+  ratingType: String
+  category: ID!
+}
+
+
+type Category @model
+  @key(fields: ["id"]) 
+  @auth(
+    rules: [
+      { allow: public, operations: [read], provider: apiKey },
+      { allow: private, operations: [create, update, read]},
+      { allow: owner }
+    ]
+  )
+{
+  id: ID!
+  name: String!
+  description: String!
+  numRatings: Int
+  numCategoryItems: Int
+  imgsrc: String
+  createdBy: String
+  subCategoryOptions: [String]
+  customFields: [String]
+  items: [CategoryItem] @connection(keyName: "byCategory", fields: ["id"])
+}
+
+type customFieldTuple {
+     key: String
+     value: String
+}
+
+
+type CategoryItem @model 
+  @key(name: "byCategory", fields: ["categoryID", "name"]) 
+  @key(name: "byCategoryScore", fields: ["categoryID", "score"], queryField : "categoryByScore") 
+  @auth(
+    rules: [
+      { allow: public, operations: [read], provider: apiKey},
+      { allow: private, operations: [create, update, read]},
+      { allow: owner }
+    ]
+  )
+{
+  id: ID!
+  categoryID: ID!
+  category: Category @connection(fields: ["categoryID"])
+  name: String!
+  imgsrc: String
+  description: String
+  content: String
+  SubCategory: String
+  score: Int!
+  createdBy: String
+  comments: [CategoryItemComment] @connection(keyName: "byCategoryItem", fields: ["id"])
+  customFields: [customFieldTuple]
+}
+
+type CategoryItemComment @model
+  @key(name: "byCategoryItem", fields: ["categoryItemID", "content"])
+  @auth(
+    rules: [
+      { allow: public, operations: [read], provider: apiKey },
+      { allow: private, operations: [read, create]},
+      { allow: owner }
+    ]
+  )
+{
+  id: ID!
+  categoryItemID: ID!
+  content: String!
+  user: String!
+  userName: String!
+}
+

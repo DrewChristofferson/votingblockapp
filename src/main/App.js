@@ -18,7 +18,7 @@ import ErrorPage from './ErrorPage'
 import ComingSoon from '../pages/create/ComingSoon'
 import Support from './support'
 import { Auth } from 'aws-amplify'
-// import awsConfig from '../aws-exports';
+import awsConfig from '../aws-exports';
 
 
 

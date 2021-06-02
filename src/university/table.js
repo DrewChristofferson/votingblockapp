@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 import * as bs from 'react-bootstrap'
 import { Link, useRouteMatch, useHistory } from 'react-router-dom'
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import { faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons'
 import { updateCourse as updateCourseMutation } from '../graphql/mutations';
 import { updateProfessor as updateProfessorMutation } from '../graphql/mutations';
 import * as FaIcons from 'react-icons/fa'
