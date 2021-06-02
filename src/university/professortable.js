@@ -1,0 +1,133 @@
+import React from 'react'
+import * as bs from 'react-bootstrap'
+import { useRouteMatch } from 'react-router-dom'
+import TableFooter from '../components/tablefooter'
+import BooksImg from '../images/books.jpg'
+import SearchBar from '../components/searchbar'
+import CategoryToggle from '../components/categorytoggle'
+import Table from './table'
+import FilterMobile from'../main/FilterMobile'
+import NewSideBarDesktop from'../main/newsidebardesktop'
+import styled from 'styled-components'
+import { useMediaQuery } from 'react-responsive'
+
+const LoadingContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+`
+
+function ProfessorTable(props) {
+    const match = useRouteMatch("/schools/:sid/:did/:type")
+    const isMobile = useMediaQuery({ query: '(max-width: 759px)' })
+    let professors = props.professors[0]
+    let totalItemsCount = props.professors[1];
+    //if there are no professors, default the number of pages to 1
+    let numPages = Math.ceil(props.professors[1] / 10);
+    let myIndex = props.professors[2];
+
+
+    let getImg = (professor) => {
+        if (professor.imgsrc){
+            return(
+                <img className="profile" alt={professor.name} style={{height:"160px", width: "140px"}} src={professor.imgsrc} />
+            )
+        } else {
+            return(
+                <img className="profile" alt={professor.name} style={{height:"160px", width: "140px"}} src={BooksImg} />
+            )
+        }
+    }
+
+    let getHeader = () => {
+        if (!props.detail){
+            return(
+                <div className="tableHeader">
+                    <div className="tableHeaderToggle">
+                        <CategoryToggle handleChangeToggle={props.handleChangeToggle} CATEGORIES={props.CATEGORIES} categoryValue={props.categoryValue}/>
+                    </div>
+                    {
+                        isMobile ?
+                        <div className="searchContainer">
+                            <div className="tableHeaderSearch">
+                                <SearchBar handleChangeSearch={props.handleChangeSearch} />
+                            </div>
+                            <div className="tableHeaderResults">
+                                <LoadingContainer>
+                                {
+                                        props.isFinishedLoading ?
+                                        match.params.sid === "all" && !props.isSearched ?
+                                        <>Found All Professors</>
+                                        // <>Found {totalItemsCount} {match.params.type}</>
+                                        :
+                                        <>Found {totalItemsCount} {match.params.type}</>
+                                        :
+                                        
+                                            <bs.Spinner animation="grow" size="sm" role="status">
+                                                <span className="sr-only">Loading...</span>
+                                            </bs.Spinner>
+                                        
+                                    }
+                                </LoadingContainer>
+                                
+                            </div>
+                        </div>
+                        :
+                        <>
+                        <div className="tableHeaderSearch">
+                            <SearchBar handleChangeSearch={props.handleChangeSearch} />
+                        </div>
+                        <div className="tableHeaderResults">
+                            <LoadingContainer>
+                            {
+                                        props.isFinishedLoading ?
+                                        match.params.sid === "all" && !props.isSearched ?
+                                        <>Found All Professors</>
+                                        // <>Found {totalItemsCount} {match.params.type}</>
+                                        :
+                                        <>Found {totalItemsCount} {match.params.type}</>
+                                        :
+                                        
+                                            <bs.Spinner animation="grow" size="sm" role="status">
+                                                <span className="sr-only">Loading...</span>
+                                            </bs.Spinner>
+                                        
+                                    }
+                            </LoadingContainer>
+                            
+                        </div>
+                        </>
+                    }
+                </div>
+            )
+        } else {
+            return null;
+        }
+    }
+
+    let getFooter = () => {
+        if (!props.detail){
+            return(
+                    <TableFooter isSearched={props.isSearched} itemCount={professors.length} savedNextToken={props.savedNextToken} numPages={numPages} totalItemsCount={totalItemsCount} myIndex={myIndex} nextPage={props.nextPage} previousPage={props.previousPage} pageNum={props.pageNum}/>
+            )
+        } else {
+            return null;
+        }
+    }
+
+    return(
+        <div>
+            {/* {
+                isMobile ? */}
+                <FilterMobile handleChangeSearch={props.handleChangeSearch} colleges={props.colleges} updateFinishedLoading={props.updateFinishedLoading} initPageNum={props.initPageNum}/>
+                {/* :
+                <NewSideBarDesktop colleges={props.colleges} initPageNum={props.initPageNum}/>
+            }    */}
+            {getHeader()}
+            <Table isSearched={props.isSearched} savedNextToken={props.savedNextToken} professors={professors} getImg={getImg} createRating={props.createRating} getRatings={props.getRatings}/>
+            {getFooter()}
+        </div>   
+    )
+}
+
+export default ProfessorTable;
