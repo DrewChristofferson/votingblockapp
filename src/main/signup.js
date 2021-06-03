@@ -1,24 +1,19 @@
-// import React from 'react';
-// import * as bs from 'react-bootstrap'
-// import '../styles/App.css';
-// // import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
-// import Amplify, { Auth, Hub } from 'aws-amplify';
-import React, { useState, useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { BrowserRouter as Router, useHistory } from 'react-router-dom';
 import { Formik, Field, Form, FormikHelpers } from "formik";
 import axios from 'axios';
-import { BrowserRouter as Router, Link } from 'react-router-dom'; 
-// import { EntryPage } from '../Components/login'; 
-// import EntryCard from '../Components/EntryCard';
-// import InputGroup from '../Components/InputGroup';
-// import LoginInput from '../Components/LoginInput';
-// import LoginButton from '../Components/LoginButton';
+// import AppContext from '../../context/context';
+import { Link } from 'react-router-dom'; 
+// import { EntryPage } from '../../Components/Login/login'; 
+// import EntryCard from '../../Components/EntryCard/EntryCard';
+// import InputGroup from '../../Components/InputGroup/InputGroup';
+// import LoginInput from '../../Components/Input/LoginInput';
+// import LoginButton from '../../Components/LoginButton/LoginButton';
 // import { Container, FormContainer } from '../../Components/Container/container'
 import Promo from './loginpromo'
-import styled from 'styled-components'; 
+import styled from 'styled-components'
 import { Auth } from 'aws-amplify'
 import AppContext from '../context/context'
-
 
 
 const LoginInput = styled.input`
@@ -130,74 +125,49 @@ const Error = styled.p`
     color: red;
 `
 
-
-
-export default function Login() {
+export default function SignUp() {
     const history = useHistory();
-    const initialValues= { username: '', password: '' };
-    const initialValuesCode= { code: '' };
+    const initialValues= { name:'', email: '', username: '', password: '' };
+    const initialValuesCode= { code:''};
     const [showError, setShowError] = useState(false);
-    const [notConfirmed, setNotConfirmed] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [errorMessageCode, setErrorMessageCode] = useState('');
+    const [isCreated, setIsCreated] = useState(false);
     const [email, setEmail] = useState('');
     const context = useContext(AppContext)
 
 
-
-
     const handleSubmit = async(values, actions) => {
-        const username = values.username;
+        const username = values.email;
+        setEmail(username);
         const password = values.password;
+        const name = values.name;
         try {
-            const user = await Auth.signIn(username, password);
-            console.log(user);
-            context.signin(user);
-            history.push("/")
-        } catch (error) {
-            if(error.code === "UserNotConfirmedException"){
-                setEmail(username)
-                try {
-                    await Auth.resendSignUp(username);
-                    console.log('code resent successfully');
-                } catch (err) {
-                    console.log('error resending code: ', err);
+            const { user } = await Auth.signUp({
+                username,
+                password,
+                attributes: {
+                    name,          // optional
+                    // other custom attributes 
                 }
-                setNotConfirmed(true);
-            }
-            else{
-                setErrorMessage(error.message)
-            }
-            console.log('error signing in', error);
+            });
+            console.log(user);
+            setIsCreated(true);
+        } catch (error) {
+            setErrorMessage(error.message)
+            console.log('error signing up:', error);
         }
-    //     axios({
-    //         method: 'post',
-    //         data: {
-    //           username: values.username,
-    //           password: values.password
-    //         }
-    //       }).then(
-    //         function(response) {
-    //             if(response.status === 200){    
-    //                 history.push("/journals");
-    //             } else if (response.status === 403){
-    //                 console.log("invalid username or password");
-    //             } else {
-    //                 console.log("server error");
-    //             }
-    //         }
-    //     ).catch(
-    //         function(e) {
-    //             setShowError(true);
-    //         }
-    //     );
-    //     actions.setSubmitting(false);
     }
 
     const handleSubmitCode = async(values, actions) => {
         const code = values.code;
+        const username = values.email;
+        const password = values.password;
         try {
             await Auth.confirmSignUp(email, code);
+            const user = await Auth.signIn(username, password);
+            console.log(user);
+            context.signin(user);
             history.push("/")
           } catch (error) {
                 setErrorMessageCode(error.message)
@@ -229,18 +199,45 @@ export default function Login() {
         //     }
         // );
         // actions.setSubmitting(false);
+    } 
+
+    const login = (values) => {
+        // axios({
+        //     method: 'post',
+        //     url: `${context.API_BASE_URL}/login`,
+        //     data: {
+        //       username: values.username,
+        //       password: values.password
+        //     }
+        //   }).then(
+        //     function(response) {
+        //         if(response.status === 200){    
+        //             context.updateToken(response.headers.authorization);
+        //             history.push("/journals");
+        //         } else if (response.status === 403){
+        //             console.log("invalid username or password");
+        //         } else {
+        //             console.log("server error");
+        //         }
+        //     }
+        // ).catch(
+        //     function(e) {
+        //         setShowError(true);
+        //     }
+        // );
+    
     }
 
     return (
         <Router>
         <Container>
-            <Promo />
+            <Promo/>
             <FormContainer>
             <EntryPage>
                 {/* <PageHeader to="/">Awesome Journal</PageHeader> */}
                 <EntryCard>
                     {
-                        notConfirmed ?
+                        isCreated ?
                         <>
                         <h1 data-testid="signupcode">Sign Up</h1>
                         {
@@ -265,38 +262,51 @@ export default function Login() {
                         </>
                         :
                         <>
-                            <h1 data-testid='loginheader'>Login</h1>
-                            {
-                                errorMessage ?
-                                <Error>{errorMessage}</Error>
-                                :
-                                <></>
-                            }  
-                            <Formik 
-                                initialValues={initialValues}
-                                onSubmit={(values, actions) => {
-                                handleSubmit( values, actions );
-                            }}>
-                                <Form>
-                                    <InputGroup>
-                                        <label htmlFor='username'>Username</label>
-                                        <Field name='username' id='username' type='text' as={LoginInput} />
-                                    </InputGroup>
-                                    <InputGroup>
-                                        <label htmlFor='password'>Password</label>
-                                        <Field name='password' id='password' type='password' as={LoginInput} />
-                                    </InputGroup>
-                                    <LoginButton type='submit' data-testid='loginbutton' full>Sign In</LoginButton>
-                                </Form> 
-                            </Formik>
-                             
-                            <span>
-                                Don't have an account?
-                                <Link to="/signup" data-testid='tosignup' onClick={() => history.push("/signup")}>Sign Up</Link>
-                            </span>
+                        <h1 data-testid="signupheader">Sign Up</h1>
+                        {
+                            errorMessage ?
+                            <Error>{errorMessage}</Error>
+                            :
+                            <></>
+                        }
+                        <Formik 
+                            initialValues={initialValues}
+                            onSubmit={(values, actions) => {
+                            handleSubmit( values, actions );
+                        }}>
+                            <Form>
+                                <InputGroup>
+                                    <label htmlFor='name'>Name</label>
+                                    <Field name='name' id="name" type='text' as={LoginInput} />
+                                </InputGroup>
+                                <InputGroup>
+                                    <label htmlFor='email'>Email</label>
+                                    <Field name='email' id="email" type='text'  as={LoginInput} />
+                                </InputGroup>
+                                {/* <InputGroup>
+                                    <label htmlFor='username'>Username</label>
+                                    <Field name='username' id="username" type='text' placeholder='JohnT' as={LoginInput} />
+                                </InputGroup> */}
+                                <InputGroup>
+                                    <label htmlFor='password'>Password</label>
+                                    <Field name='password' id='password' type='password'  as={LoginInput} />
+                                </InputGroup>
+                                <LoginButton type='submit' data-testid="signupbutton" full>Sign Up</LoginButton>
+                            </Form> 
+                        </Formik>
                         </>
+
                     }
-                    
+                    {
+                        showError ?
+                        <p style={{color: 'red'}}>Username already exists</p>
+                        :
+                        <></>
+                    }   
+                    <span>
+                        Already have an account?
+                        <Link to="/login" onClick={() => history.push("/login")} data-testid='tologin'>Sign In</Link>
+                    </span>
                 </EntryCard>
             </EntryPage>
           </FormContainer>

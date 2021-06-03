@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
+import { useHistory } from 'react-router-dom'
 import AppContext from '../context/context'
 import { Auth } from 'aws-amplify';
 import * as bs from 'react-bootstrap'
@@ -12,23 +13,33 @@ function Header() {
     const [isSignedIn, setIsSignedIn] = useState(false);
     const [name, setName] = useState();
     const context = useContext(AppContext)
+    const history = useHistory();
 
-    useEffect(() => {
-        if(context.user){
-            setIsSignedIn(true)
-            checkUser();
-        }
-    }, [context])
+    // useEffect(() => {
+    //     if(context.user){
+    //         setIsSignedIn(true)
+    //         checkUser();
+    //     }
+    // }, [context])
 
-    const checkUser = async() => {
-        const user = await Auth.currentAuthenticatedUser()
-        setName(user.attributes.name)
-    }
+    // const checkUser = async() => {
+    //     const user = await Auth.currentAuthenticatedUser()
+    //     setName(user.attributes.name)
+    // }
 
     const showModal = () => {
         return(
             <SignupModal />
         )
+    }
+
+    const logout = async() => {
+        try {
+            await Auth.signOut();
+            context.logout();
+        } catch (error) {
+            console.log('error signing out: ', error);
+        }
     }
 
     let createNavDropdown = () => {
@@ -56,7 +67,7 @@ function Header() {
             //TODO: change size
             return (
                 <>
-                <SignIn onClick={() => Auth.federatedSignIn()}>Sign In</SignIn>
+                <SignIn onClick={() => history.push("/login")}>Sign In</SignIn>
                 {/* <SignupModal /> */}
                 </>
                 // <AmplifySignInButton>Sign In</AmplifySignInButton>
@@ -97,11 +108,11 @@ function Header() {
                         <Link to="/cart" className="nav-link"> <i className="fas fa-shopping-cart"> </i> </Link>
                     </bs.Nav>
                     {
-                        isSignedIn ?
+                        context.user ?
                         <bs.Nav style={{marginRight: "5%"}}>
                             <bs.NavDropdown title={
                                 <div style={{display: "inline", paddingRight: "15px"}}>
-                                    {name}
+                                    {context.user.attributes.name}
                                     {/* <img src={context?.user?.attributes?.picture} height="50px" alt="" /> */}
                                 </div>
                                 } 
@@ -110,13 +121,13 @@ function Header() {
                                 <bs.NavDropdown.Item href="#action/3.2">Account</bs.NavDropdown.Item> */}
                                 <bs.NavDropdown.Item href="/support">Support</bs.NavDropdown.Item>
                                 <bs.NavDropdown.Divider />
-                                <bs.NavDropdown.Item onClick={() => Auth.signOut()}>Sign Out</bs.NavDropdown.Item>
+                                <bs.NavDropdown.Item onClick={logout}>Sign Out</bs.NavDropdown.Item>
                                 {/* <button onClick={() => Auth.signOut()}>Sign Out</button> */}
                                 {/* <bs.NavDropdown.Item href="#action/3.4">< AmplifySignOut /> </bs.NavDropdown.Item> */}
                             </bs.NavDropdown>
                         </bs.Nav>
                         :
-                        <SignIn onClick={() => Auth.federatedSignIn()}>Sign In</SignIn>
+                        <SignIn onClick={() => history.push("/login")}>Sign In</SignIn>
                     }
                 </bs.Navbar.Collapse>
             </bs.Navbar>

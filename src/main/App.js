@@ -16,6 +16,8 @@ import CreateCategory from '../pages/create/CreateCategory'
 import Survey from '../pages/survey/Survey'
 import ErrorPage from './ErrorPage'
 import ComingSoon from '../pages/create/ComingSoon'
+import Login from './login'
+import Signup from './signup'
 import Support from './support'
 import { Auth } from 'aws-amplify'
 import awsConfig from '../aws-exports';
@@ -66,6 +68,12 @@ export default function App () {
                     </Route>
                     <Route path="/home">
                       <Home />
+                    </Route>
+                    <Route path="/login">
+                      <Login />
+                    </Route>
+                    <Route path="/signup">
+                      <Signup />
                     </Route>
                     <Route path="/about">
                       <About />
