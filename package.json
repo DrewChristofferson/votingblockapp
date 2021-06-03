@@ -1,6 +1,7 @@
 {
   "name": "votingblock",
   "version": "0.1.0",
+  "homepage": "",
   "private": true,
   "dependencies": {
     "@aws-amplify/ui-react": "^1.2.0",
