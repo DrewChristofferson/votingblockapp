@@ -3,7 +3,7 @@ import * as bs from 'react-bootstrap'
 import { API, container, Storage } from 'aws-amplify'
 // import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { listSchools, listRatings, getCategory, listProfessors } from '../graphql/queries';
-import { Switch, Route, useRouteMatch } from 'react-router-dom'
+import { Switch, Route, useRouteMatch, useHistory } from 'react-router-dom'
 import { ratingsByUserAndContent, ratingsByUserAndCategory, professorsByScore, coursesByScore, coursesByDeptID, coursesByGE, coursesByName, professorsByDeptID, searchCourses, searchProfessors} from '../graphql/queries';
 import { createRating as createRatingMutation } from '../graphql/mutations';
 import { updateRating as updateRatingMutation } from '../graphql/mutations';
@@ -45,6 +45,7 @@ function BYUSchools() {
     const [isSearched, setIsSearched] = useState(false);
     const VOTE_UP  = "up";
     const VOTE_DOWN = "down";
+    const history = useHistory();
     let match = useRouteMatch();
     let matchParams = useRouteMatch("/schools/:sid/:did/:type")
     let colleges = []
@@ -383,7 +384,7 @@ function BYUSchools() {
         let ratingIdFromAPI;
         if (!context.user){
             window.localStorage.setItem('redirectURL', matchParams.url)
-            Auth.federatedSignIn()
+            history.push("/login")
         }
         else{
             try {

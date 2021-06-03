@@ -19,6 +19,10 @@ import GoogleButton from 'react-google-button'
 
 
 
+const GoogleButtonWhite = styled(GoogleButton)`
+    color: white;
+`      
+
 const LoginInput = styled.input`
     width: 100%; 
     outline: none; 
@@ -39,9 +43,12 @@ const LoginInput = styled.input`
 
 export const Container = styled.div`
 display: flex;
-position: absolute;
-height: 100%;
-width: 100%;
+
+@media(min-width: 760px){
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
 `
 
 export const FormContainer = styled.div`
@@ -50,9 +57,9 @@ display: flex;
 flex-direction: column;
 justify-content: center;
 align-items: center;
-    @media(max-width: 759px){
-        flex-basis: 100%
-    }
+@media(max-width: 759px){
+    flex-basis: 100%
+}
 `
 
 const InputGroup = styled.div`
@@ -69,6 +76,9 @@ const EntryCard = styled.div`
     width: 100%; 
     max-width: 600px; 
     padding: 50px; 
+    @media(max-width: 759px){
+        padding: 50px 10px;
+    }
     margin-bottom: 40px; 
     background-color: #ffffff; 
     text-align: center; 
@@ -90,12 +100,17 @@ const EntryCard = styled.div`
 
 export const EntryPage = styled.div`
     display: flex; 
-    align-items: center; 
+    
     flex-direction: row; 
-    min-height: 100vh;
+    @media(min-width: 760px){
+        min-height: 100vh;
+        width: 100%;
+        align-items: center; 
+        justify-content: center;
+    }
     background-color: #ffffff; 
-    justify-content: center;
-    width: 80%;
+    
+    
 `;
 
 export const PageHeader = styled(Link)`
@@ -175,7 +190,13 @@ export default function SignUp() {
             const user = await Auth.signIn(username, password);
             console.log(user);
             context.signin(user);
-            history.push("/")
+            let url = window.localStorage.getItem('redirectURL')
+            if(url){
+                history.push(url)
+                window.localStorage.removeItem('redirectURL')
+            } else {
+                history.push("/")
+            }
           } catch (error) {
                 setErrorMessageCode(error.message)
               console.log('error confirming sign up', error);

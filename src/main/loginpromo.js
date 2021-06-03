@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { IoMdBookmarks } from 'react-icons/io';
+import Logo from '../images/longlogo.png'
 
 
 const PromoContainer = styled.div`
@@ -47,8 +48,9 @@ const QuoteAuthorContent = styled.div`
 function LoginPromo() {
     return (
         <PromoContainer>
-            <IoMdBookmarks size="100"/>
-            <Title>VotingBlock</Title>
+            {/* <IoMdBookmarks size="100"/> */}
+            <img alt="VotingBlock" src={Logo} width='80%'/>
+            {/* <Title>VotingBlock</Title> */}
             {/* <QuoteLeft>&#8220;</QuoteLeft> */}
             <QuoteContent>2,048 ratings and counting 🎉</QuoteContent>
             {/* <QuoteRight>&#8221;</QuoteRight> */}

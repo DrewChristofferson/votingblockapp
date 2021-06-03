@@ -260,7 +260,7 @@ function Detail(props) {
 
     let getRating = async() => {
         if(context.user){
-            const ratingData = await API.graphql({ query: ratingsByUserAndContent, variables: { "userID": context.user.username, "contentID": {eq: match.params.oid }, sortDirection: "ASC" }});
+            const ratingData = await API.graphql({ query: ratingsByUserAndContent, variables: { "userID": context.user?.username, "contentID": {eq: match.params.oid }, sortDirection: "ASC" }});
             const itemRating = ratingData.data.ratingsByUserAndContent.items[0]
             if(itemRating){
                 setOidRating([itemRating.id, itemRating.ratingType])
@@ -842,12 +842,12 @@ function Detail(props) {
             if(isAnonymousComment){
                 userName = "VotingBlock User"
             } else {
-                userName = `${context.user.attributes.given_name} ${context.user.attributes.family_name}`
+                userName = `${context.user?.attributes?.name}`
             }
             if(match.params.type === "professors"){
-                const comment = await API.graphql({ query: createProfessorCommentMutation, variables: { input:{ "user": context.user.username, "userName": userName, "content": commentText, "professorID": match.params.oid }}});
+                const comment = await API.graphql({ query: createProfessorCommentMutation, variables: { input:{ "user": context.user?.username, "userName": userName, "content": commentText, "professorID": match.params.oid }}});
             } else if (match.params.type === "courses"){
-                const comment = await API.graphql({ query: createCourseCommentMutation, variables: { input:{ "user": context.user.username, "userName": userName, "content": commentText, "courseID": match.params.oid }}});
+                const comment = await API.graphql({ query: createCourseCommentMutation, variables: { input:{ "user": context.user?.username, "userName": userName, "content": commentText, "courseID": match.params.oid }}});
             }
             setCommentText('')
             fetchData();
@@ -962,12 +962,12 @@ function Detail(props) {
     const handleRatingClick = async(id, increment, mutation, score, item, category) => {
         if (!context.user){
             window.localStorage.setItem("redirectURL", match.url)
-            Auth.federatedSignIn()
+            history.push("/login")
         }
         else{
             if(!oidRating[1]){
                 try {
-                    const response = await API.graphql({ query: createRatingMutation, variables: { input: { "contentID": id, "userID": context.user.username, "ratingType": increment, "type": "Rating", "category": category } }});
+                    const response = await API.graphql({ query: createRatingMutation, variables: { input: { "contentID": id, "userID": context.user?.username, "ratingType": increment, "type": "Rating", "category": category } }});
                     // if (category === 'professors'){
                     //     await API.graphql({ query: updateCategoryMutation, variables: { input: { "id": "byu-professors", "numRatings": profCategory.numRatings + 1 } }});
                     // }
@@ -1296,7 +1296,7 @@ function Detail(props) {
                                         let dt = new Date(Date.parse(comment.createdAt))
                                         let dateString = `${dt.toLocaleString('default', { month: 'long' })} ${dt.getDate()}, ${dt.getFullYear()}`
                                         return(
-                                            context.user.username === comment.user ?
+                                            context.user?.username === comment.user ?
                                             <CommentItemOwner key={comment.id}>
                                                 <CommentUser>{comment.userName}</CommentUser>
                                                 <CommentDateOwner>{dateString}</CommentDateOwner>
@@ -1329,7 +1329,7 @@ function Detail(props) {
                                         </CommentSubmitContainer>
                                     </bs.Form>
                                     :
-                                    <h6>Sign in to post a comment.</h6>
+                                    <h6><Link to="/login" onClick={() => window.localStorage.setItem('redirectURL', match.url)}>Sign in</Link> to post a comment.</h6>
 
                                 }
                             </CommentFormContainer>
@@ -1590,7 +1590,7 @@ function Detail(props) {
                                         console.log(context.user.username, comment.user)
                                         return(
                                             
-                                            context.user.username === comment.user ?
+                                            context.user?.username === comment.user ?
                                             <CommentItemOwner key={comment.id}>
                                                 <CommentUser>{comment.userName}</CommentUser>
                                                 <CommentDateOwner>{dateString}</CommentDateOwner>

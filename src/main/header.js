@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useRouteMatch, userRouteMatch } from 'react-router-dom'
 import AppContext from '../context/context'
 import { Auth } from 'aws-amplify';
 import * as bs from 'react-bootstrap'
@@ -14,6 +14,7 @@ function Header() {
     const [name, setName] = useState();
     const context = useContext(AppContext)
     const history = useHistory();
+    const match = useRouteMatch();
 
     // useEffect(() => {
     //     if(context.user){
@@ -35,11 +36,17 @@ function Header() {
 
     const logout = async() => {
         try {
+            history.push("/")
             await Auth.signOut();
             context.logout();
         } catch (error) {
             console.log('error signing out: ', error);
         }
+    }
+
+    const login = () => {
+        history.push("/login")
+        window.localStorage.setItem("redirectURL", match.url)
     }
 
     let createNavDropdown = () => {
@@ -127,7 +134,7 @@ function Header() {
                             </bs.NavDropdown>
                         </bs.Nav>
                         :
-                        <SignIn onClick={() => history.push("/login")}>Sign In</SignIn>
+                        <SignIn onClick={login}>Sign In</SignIn>
                     }
                 </bs.Navbar.Collapse>
             </bs.Navbar>

@@ -21,6 +21,7 @@ import Signup from './signup'
 import Support from './support'
 import { Auth } from 'aws-amplify'
 import awsConfig from '../aws-exports';
+import { useMediaQuery } from 'react-responsive'
 
 
 
@@ -29,6 +30,7 @@ async function checkUser() {
 }
 
 export default function App () {
+  const isMobile = useMediaQuery({ query: '(max-width: 759px)' })
     return (
       <Router>
         <section>
@@ -100,9 +102,9 @@ export default function App () {
                   </Switch>
               </center>
             </div>
-            <div>
-              <Footer />
-            </div>
+              <div>
+                <Footer />
+              </div>
           </div>
         </section>
           {/* <AmplifySignOut /> */}
