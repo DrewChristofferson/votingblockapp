@@ -112,7 +112,7 @@ function Header() {
                         <bs.Nav style={{marginRight: "5%"}}>
                             <bs.NavDropdown title={
                                 <div style={{display: "inline", paddingRight: "15px"}}>
-                                    {context.user.attributes.name}
+                                    {context.user?.attributes?.name}
                                     {/* <img src={context?.user?.attributes?.picture} height="50px" alt="" /> */}
                                 </div>
                                 } 

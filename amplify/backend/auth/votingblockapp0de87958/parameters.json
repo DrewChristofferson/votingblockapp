@@ -62,8 +62,10 @@
     "dependsOn": [],
     "hostedUI": true,
     "hostedUIDomainName": "votingblockapp1df0aec3-1df0aec3",
-    "authProvidersUserPool": [],
-    "hostedUIProviderMeta": "[]",
-    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"http://localhost:3000/\",\"https://votingblock.io/\"],\"LogoutURLs\":[\"http://localhost:3000/\",\"https://votingblock.io/\"]}",
-    "authProviders": []
+    "authProvidersUserPool": [
+        "Google"
+    ],
+    "hostedUIProviderMeta": "[{\"ProviderName\":\"Google\",\"authorize_scopes\":\"openid email profile\",\"AttributeMapping\":{\"email\":\"email\",\"name\":\"name\",\"username\":\"sub\"}}]",
+    "authProviders": [],
+    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"http://localhost:3000/\",\"https://votingblock.io/\"],\"LogoutURLs\":[\"http://localhost:3000/\",\"https://votingblock.io/\"]}"
 }

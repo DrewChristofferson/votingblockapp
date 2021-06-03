@@ -18,6 +18,9 @@ import Promo from './loginpromo'
 import styled from 'styled-components'; 
 import { Auth } from 'aws-amplify'
 import AppContext from '../context/context'
+import { useMediaQuery } from 'react-responsive'
+import GoogleButton from 'react-google-button'
+
 
 
 
@@ -141,6 +144,7 @@ export default function Login() {
     const [errorMessage, setErrorMessage] = useState('');
     const [errorMessageCode, setErrorMessageCode] = useState('');
     const [email, setEmail] = useState('');
+    const isMobile = useMediaQuery({ query: '(max-width: 759px)' })
     const context = useContext(AppContext)
 
 
@@ -289,6 +293,8 @@ export default function Login() {
                                     <LoginButton type='submit' data-testid='loginbutton' full>Sign In</LoginButton>
                                 </Form> 
                             </Formik>
+                            <GoogleButton onClick={() => Auth.federatedSignIn({provider: 'Google'})}>Continue with Google</GoogleButton>
+
                              
                             <span>
                                 Don't have an account?

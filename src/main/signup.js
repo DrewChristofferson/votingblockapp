@@ -14,6 +14,9 @@ import Promo from './loginpromo'
 import styled from 'styled-components'
 import { Auth } from 'aws-amplify'
 import AppContext from '../context/context'
+import { useMediaQuery } from 'react-responsive'
+import GoogleButton from 'react-google-button'
+
 
 
 const LoginInput = styled.input`
@@ -47,6 +50,9 @@ display: flex;
 flex-direction: column;
 justify-content: center;
 align-items: center;
+    @media(max-width: 759px){
+        flex-basis: 100%
+    }
 `
 
 const InputGroup = styled.div`
@@ -134,6 +140,7 @@ export default function SignUp() {
     const [errorMessageCode, setErrorMessageCode] = useState('');
     const [isCreated, setIsCreated] = useState(false);
     const [email, setEmail] = useState('');
+    const isMobile = useMediaQuery({ query: '(max-width: 759px)' })
     const context = useContext(AppContext)
 
 
@@ -231,7 +238,12 @@ export default function SignUp() {
     return (
         <Router>
         <Container>
-            <Promo/>
+            {
+                isMobile ?
+                <></>
+                :
+                <Promo/>
+            }
             <FormContainer>
             <EntryPage>
                 {/* <PageHeader to="/">Awesome Journal</PageHeader> */}

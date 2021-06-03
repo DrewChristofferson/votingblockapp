@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import AppContext from './context'
 import App from '../main/App'
 import { Auth, Hub } from 'aws-amplify';
@@ -13,28 +13,32 @@ export default function AppProvider() {
   const [ isAuthenticated, setIsAuthenticated ] = useState(false);
 
 
-    // componentDidMount() {
-    //   Hub.listen("auth", ({ payload: { event, data } }) => {
-    //     console.log(event, data)
-    //     switch (event) {
-    //       case "signIn":
-    //         this.setState({ user: data });
-    //         break;
-    //       case 'cognitoHostedUI':
-    //         console.log(data)
-    //         break;
-    //       case "signOut":
-    //         this.setState({ user: null });
-    //         break;
-    //       case "customOAuthState":
-    //         this.setState({ customState: data });
-    //     }
-    //   });
+  useEffect(() => {
+    Hub.listen('auth', ({ payload: { event, data } }) => {
+      switch (event) {
+        case 'signIn':
+        case 'cognitoHostedUI':
+          getUserSocial().then(userData => setUser(userData));
+          break;
+        case 'signOut':
+          setUser(null);
+          break;
+        case 'signIn_failure':
+        case 'cognitoHostedUI_failure':
+          console.log('Sign in failure', data);
+          break;
+      }
+    });
+
+    getUserSocial().then(userData => setUser(userData));
+  }, []);
+
+  function getUserSocial() {
+    return Auth.currentAuthenticatedUser()
+      .then(userData => userData)
+      .catch(() => console.log('Not signed in'));
+  }
   
-    //   Auth.currentAuthenticatedUser()
-    //     .then(user => this.setState({ user }))
-    //     .catch(() => console.log("Not signed in"));
-    // }
 
 
     // componentDidMount() {
