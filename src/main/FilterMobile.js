@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Link, useHistory, useRouteMatch } from 'react-router-dom'
 import styled from 'styled-components'
 import Form from 'react-bootstrap/Form'
@@ -9,6 +9,8 @@ import * as AiIcons from 'react-icons/ai'
 import SubMenu from './submenu'
 import generalEd from '../gedata'
 import { BsPrefixComponent } from 'react-bootstrap/esm/helpers'
+import mixpanel from 'mixpanel-browser';
+import AppContext from '../context/context'
 
 const FilterContainer = styled.div`
     color: black;
@@ -86,6 +88,7 @@ function FilterMobile(props) {
     const [selectedDepartment, setSelectedDepartment] = useState(match.params.did);
     const [selectedSchool, setSelectedSchool] = useState(match.params.sid);
     const history = useHistory();
+    const context = useContext(AppContext)
 
     useEffect(() => {
         let temp = {};
@@ -214,6 +217,10 @@ function FilterMobile(props) {
         props.updateFinishedLoading();
         props.initPageNum();
         props.handleChangeSearch('');
+        const isLoggedIn = context.isAuthenticated
+          mixpanel.track(`select-school-${match.params.category}-click`, {
+            'isLoggedIn': {isLoggedIn}
+            });
         // if(schools[e.target.value].departments.items[0]){
         //   setFormData({ ...formData, 'departmentID': schools[e.target.value].departments.items[0].id});
         // }
@@ -230,6 +237,10 @@ function FilterMobile(props) {
         props.updateFinishedLoading();
         props.initPageNum();
         props.handleChangeSearch('');
+        const isLoggedIn = context.isAuthenticated
+          mixpanel.track(`select-deparment-${match.params.category}-click`, {
+            'isLoggedIn': {isLoggedIn}
+            });
         // setFormData({ ...formData, 'departmentID': schools[selectedSchool].departments.items[e.target.value].id});
       }
 
@@ -243,6 +254,10 @@ function FilterMobile(props) {
           setIsGEFilter(false);
           props.initPageNum();
           props.handleChangeSearch('');
+          const isLoggedIn = context.isAuthenticated
+          mixpanel.track(`major-filter-${match.params.category}-click`, {
+            'isLoggedIn': {isLoggedIn}
+            });
       }
 
       const handleGEClick = () => {
@@ -256,6 +271,10 @@ function FilterMobile(props) {
           props.updateFinishedLoading();
           props.initPageNum();
           props.handleChangeSearch('');
+          const isLoggedIn = context.isAuthenticated
+          mixpanel.track(`ge-filter-${match.params.category}-click`, {
+            'isLoggedIn': {isLoggedIn}
+            });
       }
 
     return (

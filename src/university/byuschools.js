@@ -16,6 +16,7 @@ import Detail from './detail'
 import { Auth } from 'aws-amplify';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import AppContext from '../context/context'
+import mixpanel from 'mixpanel-browser';
 import MyTheme from '../styles/amplifyTheme'
 
 
@@ -60,6 +61,10 @@ function BYUSchools() {
         
         fetchData();
         fetchCategories();
+        const isLoggedIn = context.isAuthenticated
+        mixpanel.track('home-page-visit', {
+            'isLoggedIn': {isLoggedIn},
+            });
       
       }, []);
 
@@ -384,6 +389,10 @@ function BYUSchools() {
         let ratingIdFromAPI;
         if (!context.user){
             window.localStorage.setItem('redirectURL', matchParams.url)
+            mixpanel.track('unauthenticated-user-click', {
+                'location': 'table-page',
+                'isLoggedIn': false,
+              });
             history.push("/login")
         }
         else{
@@ -404,6 +413,12 @@ function BYUSchools() {
 
                     }
                     updateScore(contentID, score, type, mutationName);
+                    const isLoggedIn = context.isAuthenticated
+                    mixpanel.track('new-rating', {
+                        'increment': {type},
+                        'location': 'table-page',
+                        'isLoggedIn': {isLoggedIn},
+                      });
                     //getRatings(userid);
                 } catch (e) {
                     console.log(e);
@@ -411,6 +426,12 @@ function BYUSchools() {
                     //getData();
                 }
             } else if (ratingIdFromAPI[0].ratingType === type){
+                const isLoggedIn = context.isAuthenticated
+                    mixpanel.track('delete-rating', {
+                        'increment': {type},
+                        'location': 'table-page',
+                        'isLoggedIn': {isLoggedIn},
+                      });
                 type === VOTE_UP ? type = VOTE_DOWN : type = VOTE_UP;
                 try {
                     await API.graphql({ query: deleteRatingMutation, variables: { input: { "id": ratingIdFromAPI[0].id } }});
@@ -433,6 +454,12 @@ function BYUSchools() {
                 try {
                     await API.graphql({ query: updateRatingMutation, variables: { input: { "id": ratingIdFromAPI[0].id, "ratingType": type } }});
                     updateScore(contentID, score, type, mutationName);
+                    const isLoggedIn = context.isAuthenticated
+                    mixpanel.track('update-rating', {
+                        'increment': {type},
+                        'location': 'table-page',
+                        'isLoggedIn': {isLoggedIn},
+                      });
                     //getRatings(userid);
                 } catch (e) {
                     return e;
@@ -474,6 +501,11 @@ function BYUSchools() {
 
     const toggleCategory = (val) => {
         setCategoryValue(val)
+        const isLoggedIn = context.isAuthenticated
+        mixpanel.track('toggle-category', {
+            'destination': {val},
+            'isLoggedIn': {isLoggedIn},
+            });
     }
 
     let initPageNum = () => {
@@ -486,13 +518,28 @@ function BYUSchools() {
             getDataProfessors(savedNextTokenProfessor);
             setPageStartIndex(index);
             setPageNum(pageNum + 1);
+            const isLoggedIn = context.isAuthenticated
+            mixpanel.track('see-more-professors', {
+                'page': 'all',
+                'isLoggedIn': {isLoggedIn},
+                });
         } else if (matchParams.params.sid === "all" && matchParams.params.type === "courses") {
             getDataCourses(savedNextTokenCourse);
             setPageStartIndex(index);
             setPageNum(pageNum + 1);
+            const isLoggedIn = context.isAuthenticated
+            mixpanel.track('see-more-courses', {
+                'page': 'all',
+                'isLoggedIn': {isLoggedIn},
+                });
         } else {
             setPageStartIndex(index);
             setPageNum(pageNum + 1);
+            const isLoggedIn = context.isAuthenticated
+            mixpanel.track(`see-more-${matchParams.params.type}`, {
+                'page': 'filtered',
+                'isLoggedIn': {isLoggedIn},
+                });
         }
     }
 
@@ -513,11 +560,26 @@ function BYUSchools() {
     let handleChangeSearch = (val) => {
         if(matchParams.params.sid === "all" && matchParams.params.type === "courses"){
             getDataCourses(undefined, val)
+            const isLoggedIn = context.isAuthenticated
+            mixpanel.track(`search-courses`, {
+                'page': 'all',
+                'isLoggedIn': {isLoggedIn},
+                });
         }
         else if(matchParams.params.sid === "all" && matchParams.params.type === "professors"){
             getDataProfessors(undefined, val)
+            const isLoggedIn = context.isAuthenticated
+            mixpanel.track(`search-professors`, {
+                'page': 'all',
+                'isLoggedIn': {isLoggedIn},
+                });
         } else {
             setSearchFilter(val);
+            const isLoggedIn = context.isAuthenticated
+            mixpanel.track(`search-${matchParams.params.type}`, {
+                'page': 'filtered',
+                'isLoggedIn': {isLoggedIn},
+                });
         }
         // setPageNum(1);
         // setPageStartIndex(0);

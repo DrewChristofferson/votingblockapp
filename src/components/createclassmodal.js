@@ -1,6 +1,6 @@
 import Button from "react-bootstrap/Button"
 import Modal from "react-bootstrap/Modal"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
 import { useRouteMatch } from 'react-router-dom'
 import Form from "react-bootstrap/Form"
 import SearchBar from './searchbar'
@@ -8,6 +8,8 @@ import { API } from 'aws-amplify'
 import { listProfessors, listSchools, searchCourses, searchProfessors, getProfessor, getCourse } from '../graphql/queries';
 import { createClass as createClassMutation } from '../graphql/mutations';
 import styled from 'styled-components'
+import mixpanel from 'mixpanel-browser';
+import AppContext from "../context/context"
 
 const SearchTable = styled.div`
   display: flex;
@@ -56,6 +58,7 @@ function CreateClassModal(props) {
     const [courses, setCourses] = useState();
     const [searchFilter, setSearchFilter] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const context = useContext(AppContext)
 
 
     const handleClose = () => {
@@ -111,7 +114,11 @@ function CreateClassModal(props) {
         if(isAlreadyClass){
           console.log("already class")
         } else {
-          await API.graphql({ query: createClassMutation, variables: { input: searchFormData } });
+          await API.graphql({ query: createClassMutation, authMode: 'API_KEY', variables: { input: searchFormData } });
+          const isLoggedIn = context.isAuthenticated
+          mixpanel.track(`select-deparment-${match.params.category}-click`, {
+            'isLoggedIn': {isLoggedIn}
+            });
         }
         //use props as state
         //props.setProfessors([ ...props.professors, formData ]);
@@ -126,9 +133,17 @@ function CreateClassModal(props) {
     let handleChangeSearch = (val) => {
       if(match.params.type === "courses"){
           getAllProfessors(val)
+          const isLoggedIn = context.isAuthenticated
+          mixpanel.track(`search-classes-by-professor`, {
+            'isLoggedIn': {isLoggedIn}
+            });
       }
       else if(match.params.type === "professors"){
         getAllCourses(val)
+        const isLoggedIn = context.isAuthenticated
+          mixpanel.track(`search-classes-by-course`, {
+            'isLoggedIn': {isLoggedIn}
+            });
       }
       // setPageNum(1);
       // setPageStartIndex(0);
@@ -141,6 +156,10 @@ function CreateClassModal(props) {
       }
       else{
         setSearchFormData({ ...searchFormData, 'professorID': id, 'courseID': match.params.oid});
+        const isLoggedIn = context.isAuthenticated
+          mixpanel.track(`select-class-professor`, {
+            'isLoggedIn': {isLoggedIn}
+            });
       }
     } else if (match.params.type === 'professors'){
       if(!id){
@@ -148,6 +167,10 @@ function CreateClassModal(props) {
       }
       else{
         setSearchFormData({ ...searchFormData, 'courseID': id, 'professorID': match.params.oid});
+        const isLoggedIn = context.isAuthenticated
+          mixpanel.track(`select-class-course`, {
+            'isLoggedIn': {isLoggedIn}
+            });
       }
     }
   }

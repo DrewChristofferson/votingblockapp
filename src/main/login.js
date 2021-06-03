@@ -20,6 +20,7 @@ import { Auth } from 'aws-amplify'
 import AppContext from '../context/context'
 import { useMediaQuery } from 'react-responsive'
 import GoogleButton from 'react-google-button'
+import mixpanel from 'mixpanel-browser';
 
 
 const GoogleButtonWhite = styled(GoogleButton)`
@@ -172,15 +173,14 @@ export default function Login() {
         const password = values.password;
         try {
             const user = await Auth.signIn(username, password);
-            console.log(user);
             context.signin(user);
             history.push("/")
+            mixpanel.track('login')
         } catch (error) {
             if(error.code === "UserNotConfirmedException"){
                 setEmail(username)
                 try {
                     await Auth.resendSignUp(username);
-                    console.log('code resent successfully');
                 } catch (err) {
                     console.log('error resending code: ', err);
                 }
@@ -189,7 +189,6 @@ export default function Login() {
             else{
                 setErrorMessage(error.message)
             }
-            console.log('error signing in', error);
         }
     //     axios({
     //         method: 'post',
@@ -226,9 +225,9 @@ export default function Login() {
             } else {
                 history.push("/")
             }
+            mixpanel.track('login-after-code')
           } catch (error) {
                 setErrorMessageCode(error.message)
-              console.log('error confirming sign up', error);
           }
     
         // axios({

@@ -14,7 +14,6 @@ import AppContext from '../context/context'
 import { useMediaQuery } from 'react-responsive'
 import mixpanel from 'mixpanel-browser';
 mixpanel.init('6e42aa7487ee22e48b064f155a467a8d');
-mixpanel.track('test-home')
 
 
 

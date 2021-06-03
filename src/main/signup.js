@@ -16,6 +16,7 @@ import { Auth } from 'aws-amplify'
 import AppContext from '../context/context'
 import { useMediaQuery } from 'react-responsive'
 import GoogleButton from 'react-google-button'
+import mixpanel from 'mixpanel-browser';
 
 
 
@@ -174,12 +175,11 @@ export default function SignUp() {
                     // other custom attributes 
                 }
             });
-            console.log(user);
             setIsCreated(true);
             values.name = ''
+            mixpanel.track('signup-precode')
         } catch (error) {
             setErrorMessage(error.message)
-            console.log('error signing up:', error);
         }
     }
 
@@ -190,7 +190,6 @@ export default function SignUp() {
         try {
             await Auth.confirmSignUp(email, code);
             const user = await Auth.signIn(username, password);
-            console.log(user);
             context.signin(user);
             let url = window.localStorage.getItem('redirectURL')
             if(url){
@@ -199,9 +198,9 @@ export default function SignUp() {
             } else {
                 history.push("/")
             }
+            mixpanel.track('signup-postcode')
           } catch (error) {
                 setErrorMessageCode(error.message)
-              console.log('error confirming sign up', error);
           }
     
         // axios({

@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import {Link} from 'react-router-dom'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import styled from 'styled-components'
@@ -50,6 +51,7 @@ function Support() {
     }
     return (
         <Container>
+            <Link to="/">Back</Link>
             <h1>Leave us a message!</h1>
             {
                 isSubmitted ?

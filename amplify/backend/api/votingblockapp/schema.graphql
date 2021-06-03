@@ -85,7 +85,7 @@ type Class @model(queries: null)
   @key(name: "byCourse", fields: ["courseID", "professorID"]) 
   @auth(
     rules: [
-      { allow: public, operations: [read], provider: apiKey},
+      { allow: public, operations: [read, create], provider: apiKey},
       { allow: private, operations: [read, update, create]},
       { allow: owner }
     ]

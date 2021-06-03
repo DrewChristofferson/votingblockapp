@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
+import mixpanel from 'mixpanel-browser';
 
 const Container = styled.div`
     display: flex;
@@ -13,6 +14,7 @@ const Container = styled.div`
 `
 
 function ErrorPage() {
+        mixpanel.track('error-page-visit');
     return (
         <Container>
             <h2>Whoops, looks like this page doesn't exist.</h2>

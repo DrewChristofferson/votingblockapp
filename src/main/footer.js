@@ -6,6 +6,8 @@ import { AiFillFacebook } from 'react-icons/ai'
 import { AiFillInstagram } from 'react-icons/ai'
 import {AiFillYoutube} from 'react-icons/ai'
 import {AiOutlineTwitter} from 'react-icons/ai'
+import mixpanel from 'mixpanel-browser';
+
 
 const FooterContainer = styled.div`
     background-color: #b5b5b5;
@@ -70,12 +72,12 @@ function Footer  () {
                 <IconsContainer>
                     <IconContext.Provider value={{ color: 'black', size: '20px', style: { margin: '0 10px' } }}>
                         <div>
-                            <a href="https://www.facebook.com/votingblock.io" target="_blank"><AiFillFacebook /></a>
+                            <a onClick={() => mixpanel.track('facebook-click')} href="https://www.facebook.com/votingblock.io" target="_blank"><AiFillFacebook /></a>
                         </div>
                     </IconContext.Provider>
                     <IconContext.Provider value={{ color: 'black', size: '20px', style: { margin: '0 10px' } }}>
                         <div>
-                            <a href="https://www.instagram.com/votingblock.io/" target="_blank"><AiFillInstagram /></a>
+                            <a onClick={() => mixpanel.track('instagram-click')} href="https://www.instagram.com/votingblock.io/" target="_blank"><AiFillInstagram /></a>
                         </div>
                     </IconContext.Provider>
                     {/* <IconContext.Provider value={{ color: 'black', size: '20px', style: { margin: '0 10px' } }}>
@@ -93,8 +95,8 @@ function Footer  () {
                     &copy; {new Date().getFullYear()} Copyright: VotingBlock
                 </CopyrightText>
                 <PoliciesContainer>
-                    <FooterLink to="/terms">Terms</FooterLink> 
-                    <FooterLink to="/privacy-policy">Privacy Policy</FooterLink>      
+                    <FooterLink to="/terms" onClick={() => mixpanel.track('terms-click')}>Terms</FooterLink> 
+                    <FooterLink to="/privacy-policy" onClick={() => mixpanel.track('privacy-click')}>Privacy Policy</FooterLink>      
                 </PoliciesContainer>
             </CopyrightContainer>
         </FooterContainer>

@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import styled from 'styled-components'
 import { updateProfessor as updateProfessorMutation } from '../graphql/mutations';
 import { updateCourse as updateCourseMutation } from '../graphql/mutations';
 import { API } from 'aws-amplify'
+import mixpanel from 'mixpanel-browser';
+import AppContext from '../context/context';
 
 
 const ButtonGroupCaption = styled.div`
@@ -18,6 +20,7 @@ const Container = styled.div`
 
 function DifficultyRater(props) {
     const [selected, setSelected] = useState();
+    const context = useContext(AppContext)
 
     const handleDifRating = async(e, difficulty) => {
         let currentDifficulty;
@@ -48,10 +51,24 @@ function DifficultyRater(props) {
         if(props.type === 'course'){
             responseData = await API.graphql({ query: updateCourseMutation, variables: { input: {"id": props.id, [difficulty]: currentDifficulty + 1} } });
             props.fetchData();
+            const isLoggedIn = context.isAuthenticated
+            const analyticsID = props.id;
+            mixpanel.track('rate-difficulty-course', {
+                'difficulty': {currentDifficulty},
+                'id': {analyticsID},
+                'isLoggedIn': {isLoggedIn},
+                });
         } 
         else {
             responseData = await API.graphql({ query: updateProfessorMutation, variables: { input: {"id": props.id, [difficulty]: currentDifficulty + 1} } });
             props.fetchData();
+            const isLoggedIn = context.isAuthenticated
+            const analyticsID = props.id;
+            mixpanel.track('rate-difficulty-professor', {
+                'difficulty': {currentDifficulty},
+                'id': {analyticsID},
+                'isLoggedIn': {isLoggedIn},
+                });
         }
     }
 

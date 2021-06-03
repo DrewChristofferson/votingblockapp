@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 import SignupModal from '../components/SignupModal'
 import SignIn from '../components/SignInButton'
 import longlogo from '../images/longlogo.png'
+import mixpanel from 'mixpanel-browser';
 // import { AmplifySignOut, AmplifySignInButton } from '@aws-amplify/ui-react'
 
 function Header() {
@@ -39,6 +40,7 @@ function Header() {
             history.push("/")
             await Auth.signOut();
             context.logout();
+            mixpanel.track('logout');
         } catch (error) {
             console.log('error signing out: ', error);
         }
@@ -46,6 +48,7 @@ function Header() {
 
     const login = () => {
         history.push("/login")
+        mixpanel.track('login-button-click');
         window.localStorage.setItem("redirectURL", match.url)
     }
 
@@ -102,11 +105,11 @@ function Header() {
                 <bs.Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <bs.Navbar.Collapse id="basic-navbar-nav">
                     <bs.Nav className="mr-auto">
-                        <Link to="/" className="nav-link">Home</Link>
+                        <Link to="/" className="nav-link" onClick={() => mixpanel.track('home-click')}>Home</Link>
                         {/* <Link to="/my-categories" className="nav-link">My Categories</Link>
                         <Link to="/saved" className="nav-link">Saved</Link> */}
-                        <Link to="/about" className="nav-link">About</Link>
-                        <Link to="/support" className="nav-link">Feedback</Link>
+                        <Link to="/about" className="nav-link" onClick={() => mixpanel.track('about-click')}>About</Link>
+                        <Link to="/support" className="nav-link" onClick={() => mixpanel.track('feedback-click')}>Feedback</Link>
                         {/* <AmplifySignInButton theme={myTheme}>Sign In</AmplifySignInButton> */}
                         {/* <AmplifySignInButton >Sign In</AmplifySignInButton> */}
                         
@@ -126,7 +129,7 @@ function Header() {
                                 id="basic-nav-dropdown">
                                 {/* <bs.NavDropdown.Item href="#action/3.1">Settings</bs.NavDropdown.Item>
                                 <bs.NavDropdown.Item href="#action/3.2">Account</bs.NavDropdown.Item> */}
-                                <bs.NavDropdown.Item href="/support">Support</bs.NavDropdown.Item>
+                                <bs.NavDropdown.Item href="/support" onClick={() => mixpanel.track('support-click')}>Support</bs.NavDropdown.Item>
                                 <bs.NavDropdown.Divider />
                                 <bs.NavDropdown.Item onClick={logout}>Sign Out</bs.NavDropdown.Item>
                                 {/* <button onClick={() => Auth.signOut()}>Sign Out</button> */}

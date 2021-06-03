@@ -13,6 +13,8 @@ import styled from 'styled-components';
 import objGE from '../geobject'
 import ReactTooltip from "react-tooltip";
 import UpdateGEModal from '../components/UpdateGEModal'
+import mixpanel from 'mixpanel-browser';
+import AppContext from '../context/context'
 
 const BadgeContainer = styled(bs.Badge)`
     display: inline-block;
@@ -30,6 +32,7 @@ function Table (props) {
     const [isLoading, setIsLoading] = useState(true);
     const [showGEModal, setShowGEModal] = useState(false);
     const [geModalCourse, setGeModalCourse] = useState({});
+    const context = useContext(AppContext)
     let history = useHistory();
   
     const CLASS_VOTE_UP = "tableSelectedUp";
@@ -175,12 +178,30 @@ function Table (props) {
     function handleClick(id, type) {
         if(type){
             history.push(`/schools/all/all/${type}/${id}`);
+            const isLoggedIn = context.isAuthenticated
+            mixpanel.track(`table-item-${type}-click`, {
+                'destination': {id},
+                'location': 'detail-page',
+                'isLoggedIn': {isLoggedIn}
+              });
         }
         else {
             if (props.detail && match.params.type === "professors"){
                 history.push(`/schools/all/all/courses/${id}`);
+                const isLoggedIn = context.isAuthenticated
+                mixpanel.track(`table-item-courses-click`, {
+                    'destination': {id},
+                    'location': 'detail-page',
+                    'isLoggedIn': {isLoggedIn}
+                });
             } else {
                 history.push(`${match.url}/${id}`);
+                const isLoggedIn = context.isAuthenticated
+                mixpanel.track(`table-item-${match.params.type}-click`, {
+                    'destination': {id},
+                    'location': 'table-page',
+                    'isLoggedIn': {isLoggedIn}
+                });
             }
         }
       }

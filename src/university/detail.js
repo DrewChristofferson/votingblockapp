@@ -21,6 +21,7 @@ import { createProfessorComment as createProfessorCommentMutation } from '../gra
 import { createCourseComment as createCourseCommentMutation } from '../graphql/mutations';
 import styled from 'styled-components'
 import { useMediaQuery } from 'react-responsive'
+import mixpanel from 'mixpanel-browser';
 import objGE from '../geobject'
 import * as FaIcons from 'react-icons/fa'
 import * as AiIcons from 'react-icons/ai'
@@ -846,8 +847,22 @@ function Detail(props) {
             }
             if(match.params.type === "professors"){
                 const comment = await API.graphql({ query: createProfessorCommentMutation, variables: { input:{ "user": context.user?.username, "userName": userName, "content": commentText, "professorID": match.params.oid }}});
+                const isLoggedIn = context.isAuthenticated
+                const analyticsID = match.params.oid;
+                    mixpanel.track('post-comment-professor', {
+                        'isAnonymous': {isAnonymousComment},
+                        'id': {analyticsID},
+                        'isLoggedIn': {isLoggedIn},
+                      });
             } else if (match.params.type === "courses"){
                 const comment = await API.graphql({ query: createCourseCommentMutation, variables: { input:{ "user": context.user?.username, "userName": userName, "content": commentText, "courseID": match.params.oid }}});
+                const isLoggedIn = context.isAuthenticated
+                const analyticsID = match.params.oid;
+                    mixpanel.track('post-comment-course', {
+                        'isAnonymous': {isAnonymousComment},
+                        'id': {analyticsID},
+                        'isLoggedIn': {isLoggedIn},
+                      });
             }
             setCommentText('')
             fetchData();
@@ -956,18 +971,32 @@ function Detail(props) {
             history.push(`/schools/${match.params.sid}/${match.params.did}/courses`)
             props.getDataCourses();
         }
+        const isLoggedIn = context.isAuthenticated
+        mixpanel.track(`detail-back-click`, {
+            'isLoggedIn': {isLoggedIn}
+        });
         
     }
 
     const handleRatingClick = async(id, increment, mutation, score, item, category) => {
         if (!context.user){
             window.localStorage.setItem("redirectURL", match.url)
+            mixpanel.track('unauthenticated-user-click', {
+                'location': 'table-page',
+                'isLoggedIn': false,
+              });
             history.push("/login")
         }
         else{
             if(!oidRating[1]){
                 try {
                     const response = await API.graphql({ query: createRatingMutation, variables: { input: { "contentID": id, "userID": context.user?.username, "ratingType": increment, "type": "Rating", "category": category } }});
+                    const isLoggedIn = context.isAuthenticated
+                    mixpanel.track('new-rating', {
+                        'increment': {increment},
+                        'location': 'detail-page',
+                        'isLoggedIn': {isLoggedIn},
+                      });
                     // if (category === 'professors'){
                     //     await API.graphql({ query: updateCategoryMutation, variables: { input: { "id": "byu-professors", "numRatings": profCategory.numRatings + 1 } }});
                     // }
@@ -998,6 +1027,12 @@ function Detail(props) {
                     //getData();
                 }
             } else if (oidRating[1] === increment){
+                const isLoggedIn = context.isAuthenticated
+                    mixpanel.track('delete-rating', {
+                        'increment': {increment},
+                        'location': 'detail-page',
+                        'isLoggedIn': {isLoggedIn},
+                      });
                 increment === VOTE_UP ? increment = VOTE_DOWN : increment = VOTE_UP;
                 try {
                     await API.graphql({ query: deleteRatingMutation, variables: { input: { "id": oidRating[0] } }});
@@ -1032,6 +1067,12 @@ function Detail(props) {
                 increment === VOTE_UP ? score += 1 : score -= 1;
                 try {
                     await API.graphql({ query: updateRatingMutation, variables: { input: { "id": oidRating[0], "ratingType": increment } }});
+                    const isLoggedIn = context.isAuthenticated
+                    mixpanel.track('update-rating', {
+                        'increment': {increment},
+                        'location': 'detail-page',
+                        'isLoggedIn': {isLoggedIn},
+                      });
                     setOidRating([oidRating[0], increment])
                     if(category === 'Course' && increment === 'up'){
                         setCourse({...course, 'score': course.score + 2 })
@@ -1587,7 +1628,6 @@ function Detail(props) {
                                    comments.map(comment => {
                                         let dt = new Date(Date.parse(comment.createdAt))
                                         let dateString = `${dt.toLocaleString('default', { month: 'long' })} ${dt.getDate()}, ${dt.getFullYear()}`
-                                        console.log(context.user.username, comment.user)
                                         return(
                                             
                                             context.user?.username === comment.user ?
@@ -1625,7 +1665,7 @@ function Detail(props) {
                                         </CommentSubmitContainer>
                                     </bs.Form>
                                     :
-                                    <h6>Sign in to post a comment.</h6>
+                                    <h6><Link to="/login" onClick={() => window.localStorage.setItem('redirectURL', match.url)}>Sign in</Link> to post a comment.</h6>
 
                                 }
                             </CommentFormContainer>
