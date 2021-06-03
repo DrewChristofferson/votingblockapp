@@ -62,7 +62,7 @@ function BYUSchools() {
         fetchData();
         fetchCategories();
         const isLoggedIn = context.isAuthenticated
-        mixpanel.track('home-page-visit', {
+        mixpanel.track('byuschools-visit', {
             'isLoggedIn': {isLoggedIn},
             });
       
