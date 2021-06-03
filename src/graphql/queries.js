@@ -296,6 +296,7 @@ export const getCourse = /* GraphQL */ `
       items {
         id
         courseID
+        professorID
         professor {
           name
           id

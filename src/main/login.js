@@ -160,6 +160,7 @@ export default function Login() {
     const [errorMessage, setErrorMessage] = useState('');
     const [errorMessageCode, setErrorMessageCode] = useState('');
     const [email, setEmail] = useState('');
+    const [code, setCode] = useState('');
     const isMobile = useMediaQuery({ query: '(max-width: 759px)' })
     const context = useContext(AppContext)
 
@@ -286,9 +287,9 @@ export default function Login() {
                             handleSubmitCode( values, actions );
                         }}>
                             <Form>
-                                <InputGroup>
+                                <InputGroup onChange={(e) => setCode(e.target.value)}>
                                     <label htmlFor='code'>Enter the code sent to your email</label>
-                                    <Field name='code' id="code" type='text' as={LoginInput} />
+                                    <Field name='code' value={code} id="code" type='text' as={LoginInput} />
                                 </InputGroup>
                                 <LoginButton type='submit' data-testid="signupcodebutton" full>Get Started</LoginButton>
                             </Form> 

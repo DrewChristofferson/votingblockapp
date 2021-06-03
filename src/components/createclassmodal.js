@@ -5,7 +5,7 @@ import { useRouteMatch } from 'react-router-dom'
 import Form from "react-bootstrap/Form"
 import SearchBar from './searchbar'
 import { API } from 'aws-amplify'
-import { listProfessors, listSchools, searchCourses, searchProfessors } from '../graphql/queries';
+import { listProfessors, listSchools, searchCourses, searchProfessors, getProfessor, getCourse } from '../graphql/queries';
 import { createClass as createClassMutation } from '../graphql/mutations';
 import styled from 'styled-components'
 
@@ -89,7 +89,30 @@ function CreateClassModal(props) {
 
       async function createClass() {
         if (!searchFormData.professorID || !searchFormData.courseID) return;
-        await API.graphql({ query: createClassMutation, variables: { input: searchFormData } });
+        let isAlreadyClass = false;
+
+        if(match.params.type === 'professors'){
+          const apiData = await API.graphql({ query: getProfessor, authMode: 'API_KEY', variables: {id: match.params.oid}});
+          const classCourses = apiData.data.getProfessor.classes.items;
+          classCourses.forEach(classIn => {
+              if(classIn.professorID === searchFormData.professorID && classIn.courseID === searchFormData.courseID){
+                  isAlreadyClass = true;
+              }
+          })
+        } else if (match.params.type === 'courses'){
+          const apiData = await API.graphql({ query: getCourse, authMode: 'API_KEY', variables: {id: match.params.oid}});
+          const classProfs = apiData.data.getCourse.classes.items;
+          classProfs.forEach(classIn => {
+              if(classIn.professorID === searchFormData.professorID && classIn.courseID === searchFormData.courseID){
+                  isAlreadyClass = true;
+              }
+          })
+        }
+        if(isAlreadyClass){
+          console.log("already class")
+        } else {
+          await API.graphql({ query: createClassMutation, variables: { input: searchFormData } });
+        }
         //use props as state
         //props.setProfessors([ ...props.professors, formData ]);
         props.fetchData();

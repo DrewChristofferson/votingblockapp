@@ -154,6 +154,7 @@ export default function SignUp() {
     const [errorMessage, setErrorMessage] = useState('');
     const [errorMessageCode, setErrorMessageCode] = useState('');
     const [isCreated, setIsCreated] = useState(false);
+    const [code, setCode] = useState('');
     const [email, setEmail] = useState('');
     const isMobile = useMediaQuery({ query: '(max-width: 759px)' })
     const context = useContext(AppContext)
@@ -175,6 +176,7 @@ export default function SignUp() {
             });
             console.log(user);
             setIsCreated(true);
+            values.name = ''
         } catch (error) {
             setErrorMessage(error.message)
             console.log('error signing up:', error);
@@ -280,14 +282,14 @@ export default function SignUp() {
                             <></>
                         }
                         <Formik 
-                            initialValuesCode={initialValuesCode}
+                            initialValues={{code: ''}}
                             onSubmit={(values, actions) => {
                             handleSubmitCode( values, actions );
                         }}>
                             <Form>
-                                <InputGroup>
+                                <InputGroup onChange={(e) => setCode(e.target.value)}>
                                     <label htmlFor='code'>Enter the code sent to your email</label>
-                                    <Field name='code' id="code" type='text' as={LoginInput} />
+                                    <Field name='code' value={code} id="code" type='text' as={LoginInput} />
                                 </InputGroup>
                                 <LoginButton type='submit' data-testid="signupcodebutton" full>Get Started</LoginButton>
                             </Form> 
