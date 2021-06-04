@@ -224,7 +224,7 @@ function Home() {
                         <AboutSection>
                             <AboutTitle>Hi there and welcome to VotingBlock 👋 </AboutTitle> <br />
                             This is a new platform where you can browse categories ("Blocks") and see what the world recommends.
-                            You can easily 🔼 or 🔽 vote each item or leave a comment to add your opinion. 
+                            Sign in to easily 🔼 or 🔽 vote each item or leave a comment to add your opinion. 
                             More blocks coming soon.
                         </AboutSection>
                     }
